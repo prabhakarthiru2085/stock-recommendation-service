@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Indian Stock Recommendation Dashboard</title>
+    <link rel="stylesheet" href="/static/css/dashboard.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-content">
+                <h1><i class="fas fa-chart-line"></i> Indian Stock Recommendation Dashboard</h1>
+                <p>AI-powered stock analysis based on Screener.in data</p>
+            </div>
+        </header>
+
+        <!-- Search Section -->
+        <section class="search-section">
+            <div class="search-container">
+                <div class="search-box">
+                    <input type="text" id="companyInput" placeholder="Enter Indian company name (e.g., Infosys, TCS, HDFC Bank)" />
+                    <button id="analyzeBtn" onclick="analyzeStock()">
+                        <i class="fas fa-search"></i> Analyze Stock
+                    </button>
+                </div>
+                <div id="loading" class="loading hidden">
+                    <i class="fas fa-spinner fa-spin"></i> Analyzing... This may take 10-15 seconds
+                </div>
+            </div>
+        </section>
+
+        <!-- Results Section -->
+        <section id="resultsSection" class="results-section hidden">
+            
+            <!-- Recommendation Card -->
+            <div class="recommendation-card">
+                <div class="recommendation-header">
+                    <h2 id="companyName">Company Name</h2>
+                    <div id="recommendationBadge" class="recommendation-badge">
+                        <span id="recommendationText">HOLD</span>
+                    </div>
+                </div>
+                <div class="confidence-score">
+                    <span>Confidence Score: </span>
+                    <span id="confidenceScore">0.0</span>
+                    <div class="confidence-bar">
+                        <div id="confidenceProgress" class="confidence-progress"></div>
+                    </div>
+                </div>
+                <div class="reasoning-section">
+                    <h3><i class="fas fa-lightbulb"></i> Key Analysis Points</h3>
+                    <ul id="reasoningList"></ul>
+                </div>
+            </div>
+
+            <!-- Company Overview -->
+            <div class="data-card">
+                <div class="card-header">
+                    <h3><i class="fas fa-building"></i> Company Overview</h3>
+                </div>
+                <div class="card-content">
+                    <div class="data-grid">
+                        <div class="data-item">
+                            <span class="data-label">Current Price</span>
+                            <span id="currentPrice" class="data-value">-</span>
+                        </div>
+                        <div class="data-item">
+                            <span class="data-label">Market Cap</span>
+                            <span id="marketCap" class="data-value">-</span>
+                        </div>
+                        <div class="data-item">
+                            <span class="data-label">P/E Ratio</span>
+                            <span id="peRatio" class="data-value">-</span>
+                        </div>
+                        <div class="data-item">
+                            <span class="data-label">P/B Ratio</span>
+                            <span id="pbRatio" class="data-value">-</span>
+                        </div>
+                        <div class="data-item">
+                            <span class="data-label">Dividend Yield</span>
+                            <span id="dividendYield" class="data-value">-</span>
+                        </div>
+                        <div class="data-item">
+                            <span class="data-label">Book Value</span>
+                            <span id="bookValue" class="data-value">-</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Financial Ratios -->
+            <div class="data-card">
+                <div class="card-header">
+                    <h3><i class="fas fa-calculator"></i> Financial Ratios</h3>
+                </div>
+                <div class="card-content">
+                    <div class="data-grid">
+                        <div class="data-item">
+                            <span class="data-label">ROE (%)</span>
+                            <span id="roe" class="data-value">-</span>
+                        </div>
+                        <div class="data-item">
+                            <span class="data-label">ROCE (%)</span>
+                            <span id="roce" class="data-value">-</span>
+                        </div>
+                        <div class="data-item">
+                            <span class="data-label">Debt to Equity</span>
+                            <span id="debtToEquity" class="data-value">-</span>
+                        </div>
+                        <div class="data-item">
+                            <span class="data-label">Current Ratio</span>
+                            <span id="currentRatio" class="data-value">-</span>
+                        </div>
+                        <div class="data-item">
+                            <span class="data-label">Interest Coverage</span>
+                            <span id="interestCoverage" class="data-value">-</span>
+                        </div>
+                        <div class="data-item">
+                            <span class="data-label">Asset Turnover</span>
+                            <span id="assetTurnover" class="data-value">-</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quarterly Results -->
+            <div class="data-card">
+                <div class="card-header">
+                    <h3><i class="fas fa-chart-bar"></i> Recent Quarterly Results</h3>
+                </div>
+                <div class="card-content">
+                    <div class="table-container">
+                        <table id="quarterlyTable" class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Quarter</th>
+                                    <th>Revenue (Cr)</th>
+                                    <th>Net Profit (Cr)</th>
+                                    <th>EPS (₹)</th>
+                                    <th>Revenue Growth (%)</th>
+                                    <th>Profit Growth (%)</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Quarterly data will be populated here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Shareholding Pattern -->
+            <div class="data-card">
+                <div class="card-header">
+                    <h3><i class="fas fa-users"></i> Shareholding Pattern</h3>
+                </div>
+                <div class="card-content">
+                    <div class="shareholding-grid">
+                        <div class="shareholding-item">
+                            <div class="shareholding-label">Promoter Holding</div>
+                            <div class="shareholding-bar">
+                                <div id="promoterBar" class="shareholding-fill promoter"></div>
+                                <span id="promoterPercent" class="shareholding-percent">0%</span>
+                            </div>
+                        </div>
+                        <div class="shareholding-item">
+                            <div class="shareholding-label">Public Holding</div>
+                            <div class="shareholding-bar">
+                                <div id="publicBar" class="shareholding-fill public"></div>
+                                <span id="publicPercent" class="shareholding-percent">0%</span>
+                            </div>
+                        </div>
+                        <div class="shareholding-item">
+                            <div class="shareholding-label">Institutional Holding</div>
+                            <div class="shareholding-bar">
+                                <div id="institutionalBar" class="shareholding-fill institutional"></div>
+                                <span id="institutionalPercent" class="shareholding-percent">0%</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Analysis Scores -->
+            <div class="data-card">
+                <div class="card-header">
+                    <h3><i class="fas fa-star"></i> Analysis Breakdown</h3>
+                </div>
+                <div class="card-content">
+                    <div class="scores-grid">
+                        <div class="score-item">
+                            <div class="score-label">Financial Health</div>
+                            <div class="score-bar">
+                                <div id="financialBar" class="score-fill"></div>
+                                <span id="financialScore" class="score-value">0.0</span>
+                            </div>
+                            <div class="score-weight">Weight: 30%</div>
+                        </div>
+                        <div class="score-item">
+                            <div class="score-label">Growth Trends</div>
+                            <div class="score-bar">
+                                <div id="growthBar" class="score-fill"></div>
+                                <span id="growthScore" class="score-value">0.0</span>
+                            </div>
+                            <div class="score-weight">Weight: 25%</div>
+                        </div>
+                        <div class="score-item">
+                            <div class="score-label">Valuation</div>
+                            <div class="score-bar">
+                                <div id="valuationBar" class="score-fill"></div>
+                                <span id="valuationScore" class="score-value">0.0</span>
+                            </div>
+                            <div class="score-weight">Weight: 20%</div>
+                        </div>
+                        <div class="score-item">
+                            <div class="score-label">Profitability</div>
+                            <div class="score-bar">
+                                <div id="profitabilityBar" class="score-fill"></div>
+                                <span id="profitabilityScore" class="score-value">0.0</span>
+                            </div>
+                            <div class="score-weight">Weight: 15%</div>
+                        </div>
+                        <div class="score-item">
+                            <div class="score-label">Governance</div>
+                            <div class="score-bar">
+                                <div id="governanceBar" class="score-fill"></div>
+                                <span id="governanceScore" class="score-value">0.0</span>
+                            </div>
+                            <div class="score-weight">Weight: 10%</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Error Section -->
+        <section id="errorSection" class="error-section hidden">
+            <div class="error-card">
+                <i class="fas fa-exclamation-triangle"></i>
+                <h3>Analysis Failed</h3>
+                <p id="errorMessage">Something went wrong. Please try again.</p>
+                <button onclick="hideError()" class="retry-btn">Try Again</button>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <p>⚠️ <strong>Disclaimer:</strong> This is for educational purposes only. Not financial advice. Consult professionals for investment decisions.</p>
+            <p>Data sourced from Screener.in | Built with ❤️ for learning</p>
+        </footer>
+    </div>
+
+    <script src="/static/js/dashboard.js"></script>
+</body>
+</html>
