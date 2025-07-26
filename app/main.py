@@ -1,10 +1,7 @@
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 import logging
-from app.models import RecommendationRequest, StockRecommendation
-from app.scraper import ScreenerScraper
-from app.analyzer import StockAnalyzer
-import asyncio
+from app.models import RecommendationRequest, StockRecommendation, RecommendationType
 from typing import Dict
 
 # Setup logging
@@ -31,9 +28,16 @@ app.add_middleware(
 # app.mount("/static", StaticFiles(directory="static"), name="static")
 # templates = Jinja2Templates(directory="templates")
 
-# Initialize components
-# scraper = ScreenerScraper()  # Temporarily disabled - requires Selenium
-analyzer = StockAnalyzer()
+# Simple inline analyzer function
+def simple_analyze_stock(company_data: Dict) -> StockRecommendation:
+    """Simple stock analysis"""
+    return StockRecommendation(
+        company_name=company_data.get('company_name', 'Unknown'),
+        recommendation=RecommendationType.HOLD,
+        confidence_score=0.75,
+        reasoning=["Mock analysis - service is running correctly"],
+        key_metrics={"status": "demo"}
+    )
 
 # In-memory cache for demo purposes (use Redis in production)
 cache: Dict[str, StockRecommendation] = {}
@@ -116,7 +120,7 @@ async def get_stock_recommendation(request: RecommendationRequest):
         
         # Analyze the data
         logger.info("Analyzing company data...")
-        recommendation = analyzer.analyze_stock(company_data)
+        recommendation = simple_analyze_stock(company_data)
         
         # Cache the result
         cache[cache_key] = recommendation
