@@ -1,8 +1,5 @@
-from fastapi import FastAPI, HTTPException, BackgroundTasks, Request
+from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.staticfiles import StaticFiles
-from fastapi.templating import Jinja2Templates
-from fastapi.responses import HTMLResponse
 import logging
 from app.models import RecommendationRequest, StockRecommendation
 from app.scraper import ScreenerScraper
@@ -30,9 +27,9 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Mount static files and templates
-app.mount("/static", StaticFiles(directory="static"), name="static")
-templates = Jinja2Templates(directory="templates")
+# Mount static files and templates (temporarily disabled)
+# app.mount("/static", StaticFiles(directory="static"), name="static")
+# templates = Jinja2Templates(directory="templates")
 
 # Initialize components
 # scraper = ScreenerScraper()  # Temporarily disabled - requires Selenium
@@ -41,13 +38,18 @@ analyzer = StockAnalyzer()
 # In-memory cache for demo purposes (use Redis in production)
 cache: Dict[str, StockRecommendation] = {}
 
-@app.get("/", response_class=HTMLResponse)
-async def dashboard(request: Request):
-    """Serve the main dashboard"""
-    return templates.TemplateResponse("dashboard.html", {"request": request})
+@app.get("/")
+async def root():
+    """API root endpoint"""
+    return {
+        "message": "Stock Recommendation Service is running",
+        "status": "healthy", 
+        "docs": "/docs",
+        "health": "/health"
+    }
 
 @app.get("/api")
-async def root():
+async def api_info():
     """API health check endpoint"""
     return {
         "message": "Indian Stock Recommendation Service is running",
