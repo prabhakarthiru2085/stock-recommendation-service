@@ -35,7 +35,7 @@ app.mount("/static", StaticFiles(directory="static"), name="static")
 templates = Jinja2Templates(directory="templates")
 
 # Initialize components
-scraper = ScreenerScraper()
+# scraper = ScreenerScraper()  # Temporarily disabled - requires Selenium
 analyzer = StockAnalyzer()
 
 # In-memory cache for demo purposes (use Redis in production)
@@ -93,15 +93,24 @@ async def get_stock_recommendation(request: RecommendationRequest):
         
         logger.info(f"Processing recommendation request for: {company_name}")
         
-        # Scrape company data
-        logger.info("Scraping company data from Screener.in...")
-        company_data = scraper.scrape_company_data(company_name)
-        
-        if not company_data or not company_data.get('basic_data'):
-            raise HTTPException(
-                status_code=404, 
-                detail=f"Company '{company_name}' not found or data unavailable"
-            )
+        # Mock data for testing (scraper disabled)
+        logger.info("Using mock data for analysis...")
+        company_data = {
+            'company_name': company_name,
+            'basic_data': {
+                'name': company_name,
+                'current_price': 3500,
+                'price_earnings': 25,
+                'price_to_book': 3.2,
+                'debt_to_equity': 0.3,
+                'current_ratio': 1.8,
+                'roe': 18,
+                'roce': 22
+            },
+            'quarterly_results': [],
+            'financial_ratios': {},
+            'shareholding_pattern': {}
+        }
         
         # Analyze the data
         logger.info("Analyzing company data...")
@@ -139,18 +148,11 @@ async def get_company_data(company_name: str):
         
         logger.info(f"Fetching raw data for: {company_name}")
         
-        company_data = scraper.scrape_company_data(company_name)
-        
-        if not company_data:
-            raise HTTPException(
-                status_code=404, 
-                detail=f"Company '{company_name}' not found"
-            )
-        
+        # Return mock data (scraper disabled)
         return {
             "company_name": company_name,
-            "data": company_data,
-            "status": "success"
+            "data": "Scraper temporarily disabled - using mock data",
+            "status": "mock_data"
         }
         
     except HTTPException:
